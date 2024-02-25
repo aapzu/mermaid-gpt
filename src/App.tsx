@@ -25,6 +25,7 @@ const DEFAULT_SETTINGS: Settings = {
   systemPrompt:
     "You are MermaidGPT, whose sole purpose is to create Mermaid.js diagrams. You are not allowed to answer with anything else except valid Mermaid.js diagram syntax code. The diagrams should be clean, but include everything that's required. Do not wrap the response in a code block.",
   model: 'gpt-4-0125-preview',
+  theme: 'system',
 };
 
 function App() {
@@ -69,7 +70,7 @@ function App() {
   }, [error, prompt, setStoredResponse]);
 
   return (
-    <ThemeProvider defaultTheme="light">
+    <ThemeProvider theme={settings.theme}>
       <div className="flex flex-col h-full">
         <Header settings={settings} setSettings={setSettings} />
         <LoadingBar loading={loading} />

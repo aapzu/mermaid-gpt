@@ -9,6 +9,8 @@
     flex-direction: column;
 
     .CodeMirror {
+      color: hsl(var(--primary));
+      background: transparent;
       flex: 1;
       border-top-left-radius: 4px;
       border-top-right-radius: 4px;

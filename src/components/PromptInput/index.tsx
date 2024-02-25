@@ -39,7 +39,7 @@ export const PromptInput = ({ value, setValue }: PromptInputProps) => {
 
   return (
     <SimpleMdeReact
-      textareaProps={{ className: 'bg-transparent text-primary' }}
+      className="editor"
       value={value}
       onChange={setValue}
       options={options}
