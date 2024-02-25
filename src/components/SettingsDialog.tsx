@@ -1,6 +1,25 @@
 import { FC, useCallback } from 'react';
 
-import Dialog, { DialogProps } from './Dialog';
+import { Button } from './ui/button';
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from './ui/drawer';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
+import { Textarea } from './ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from './ui/select';
 
 const MODELS = [
   'gpt-4-0125-preview',
@@ -20,7 +39,7 @@ const MODELS = [
   'gpt-3.5-turbo-1106',
   'gpt-3.5-turbo-0125',
   'gpt-3.5-turbo-16k-0613',
-];
+] as const;
 
 export type Model = (typeof MODELS)[number];
 
@@ -30,14 +49,12 @@ export type Settings = {
   model: Model;
 };
 
-type SettingsDialogProps = Omit<DialogProps, 'children'> & {
+type SettingsDialogProps = {
   settings: Settings;
   setSettings: (settings: Settings) => void;
 };
 
 export const SettingsDialog: FC<SettingsDialogProps> = ({
-  isOpen,
-  onClose,
   settings,
   setSettings,
 }) => {
@@ -50,75 +67,70 @@ export const SettingsDialog: FC<SettingsDialogProps> = ({
         systemPrompt: data.get('systemPrompt') as string,
         model: data.get('model') as Model,
       });
-      onClose();
     },
-    [onClose, setSettings],
+    [setSettings],
   );
 
   return (
-    <Dialog isOpen={isOpen} onClose={onClose}>
-      <form className="" onSubmit={onSubmit}>
-        <div className="md:flex md:items-center mb-6">
-          <div className="md:w-1/3">
-            <label className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4">
-              OpenAI API Key
-            </label>
+    <>
+      <Drawer>
+        <DrawerTrigger asChild>
+          <Button
+            className="justify-self-end px-2 py-1 text-xs"
+            variant="outline"
+          >
+            Settings
+          </Button>
+        </DrawerTrigger>
+        <DrawerContent>
+          <div className="mx-auto w-full max-w-sm">
+            <DrawerHeader>
+              <DrawerTitle>Settings</DrawerTitle>
+            </DrawerHeader>
+            <form className="" onSubmit={onSubmit}>
+              <div className="space-y-2">
+                <div className="grid w-full max-w-sm items-center gap-1.5">
+                  <Label htmlFor="openAiApiKey">OpenAI API Key</Label>
+                  <Input
+                    type="text"
+                    id="openAiApiKey"
+                    name="openAiApiKey"
+                    defaultValue={settings.openAiApiKey}
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="systemPrompt">System prompt</Label>
+                <Textarea
+                  id="systemPrompt"
+                  name="systemPrompt"
+                  defaultValue={settings.systemPrompt}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="model">GPT Model</Label>
+                <Select defaultValue={settings.model}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a verified email to display" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {MODELS.map((model) => (
+                      <SelectItem key={model} value={model}>
+                        {model}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </form>
+            <DrawerFooter>
+              <DrawerClose asChild>
+                <Button>Save</Button>
+              </DrawerClose>
+            </DrawerFooter>
           </div>
-          <div className="md:w-2/3">
-            <input
-              className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-              type="text"
-              name="openAiApiKey"
-              defaultValue={settings.openAiApiKey}
-            />
-          </div>
-        </div>
-        <div className="md:flex md:items-center mb-6">
-          <div className="md:w-1/3">
-            <label className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4">
-              System prompt
-            </label>
-          </div>
-          <div className="md:w-2/3">
-            <textarea
-              className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500 min-h-48"
-              name="systemPrompt"
-              defaultValue={settings.systemPrompt}
-            />
-          </div>
-        </div>
-        <div className="md:flex md:items-center mb-6">
-          <div className="md:w-1/3">
-            <label className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4">
-              GPT Model
-            </label>
-          </div>
-          <div className="md:w-2/3">
-            <select
-              className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-              name="model"
-              defaultValue={settings.model}
-            >
-              {MODELS.map((model) => (
-                <option key={model} value={model}>
-                  {model}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-        <div className="md:flex md:items-center">
-          <div className="md:w-1/3"></div>
-          <div className="md:w-2/3">
-            <button
-              className="shadow bg-purple-500 hover:bg-purple-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded"
-              type="submit"
-            >
-              Save
-            </button>
-          </div>
-        </div>
-      </form>
-    </Dialog>
+        </DrawerContent>
+      </Drawer>
+    </>
   );
 };

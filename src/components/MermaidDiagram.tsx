@@ -32,6 +32,7 @@ export const MermaidDiagram: FC<{ diagram: string }> = ({ diagram }) => {
 
       if (!valid) {
         setMermaidSvg(diagram);
+        return;
       }
 
       const { svg } = await mermaid.mermaidAPI.render(

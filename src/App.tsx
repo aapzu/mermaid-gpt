@@ -1,6 +1,7 @@
 import { useLocalStorage } from '@uidotdev/usehooks';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { pick } from 'lodash';
 
 import { PromptInput } from './components/PromptInput';
 import { MermaidDiagram } from './components/MermaidDiagram';
@@ -9,6 +10,15 @@ import { useOpenAIMermaidCompletion } from './hooks/useOpenAIMermaidCompletion';
 import { Header } from './components/Header';
 import { LoadingBar } from './components/LoadingBar';
 import { Toaster } from './components/ui/sonner';
+import { EditorFooter } from './components/EditorFooter';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from './components/ui/card';
+import { ThemeProvider } from './components/ThemeProvider';
 
 const DEFAULT_SETTINGS: Settings = {
   openAiApiKey: '',
@@ -18,7 +28,10 @@ const DEFAULT_SETTINGS: Settings = {
 };
 
 function App() {
-  const [prompt, setPrompt] = useLocalStorage('mermaid-gpt-prompt-text', '');
+  const [prompt, setPrompt] = useLocalStorage(
+    'mermaid-gpt-prompt-text',
+    'A sequence diagram with three actors. Add some random content.',
+  );
   const [storedResponse, setStoredResponse] = useLocalStorage(
     'mermaid-gpt-response-text',
     '',
@@ -28,10 +41,12 @@ function App() {
     DEFAULT_SETTINGS,
   );
 
-  const { response, sendPrompt, loading, error } = useOpenAIMermaidCompletion({
-    apiKey: settings.openAiApiKey || '',
-    systemPrompt: settings.systemPrompt || '',
-  });
+  const [showResponse, setShowResponse] = useState(false);
+
+  const { response, sendPrompt, loading, error, inputTokens, outputTokens } =
+    useOpenAIMermaidCompletion({
+      ...pick(settings, ['openAiApiKey', 'model', 'systemPrompt']),
+    });
 
   const onPromptChange = useCallback(
     (prompt: string) => {
@@ -54,21 +69,46 @@ function App() {
   }, [error, prompt, setStoredResponse]);
 
   return (
-    <div className="flex flex-col h-full">
-      <Header settings={settings} setSettings={setSettings} />
-      <LoadingBar loading={loading} />
-      <main className="flex-1">
-        <div className="h-full grid grid-cols-1 lg:grid-cols-2 gap-6 p-6">
-          <div className="h-full bg-white border border-gray-100 shadow-md shadow-black/5 p-6 rounded-md">
-            <PromptInput value={prompt} setValue={onPromptChange} />
+    <ThemeProvider defaultTheme="light">
+      <div className="flex flex-col h-full">
+        <Header settings={settings} setSettings={setSettings} />
+        <LoadingBar loading={loading} />
+        <main className="container mx-auto px-4 md:px-6 lg:px-8">
+          <div className="h-full grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card className="h-full flex flex-col">
+              <CardHeader>
+                <CardTitle>Prompt</CardTitle>
+              </CardHeader>
+              <CardContent className="flex-1">
+                <PromptInput
+                  value={showResponse ? storedResponse : prompt}
+                  setValue={showResponse ? setStoredResponse : onPromptChange}
+                />
+              </CardContent>
+              <CardFooter>
+                <EditorFooter
+                  inputTokenCount={inputTokens}
+                  outputTokenCount={outputTokens}
+                  showResponse={showResponse}
+                  setShowResponse={setShowResponse}
+                />
+              </CardFooter>
+            </Card>
+            <Card className="h-full flex flex-col">
+              <CardHeader>
+                <CardTitle>Result</CardTitle>
+              </CardHeader>
+              <CardContent className="flex-1">
+                <MermaidDiagram diagram={storedResponse || ''} />
+              </CardContent>
+            </Card>
           </div>
-          <div className="h-full bg-white border border-gray-100 shadow-md shadow-black/5 p-6 rounded-md">
-            <MermaidDiagram diagram={storedResponse || ''} />
-          </div>
-        </div>
-      </main>
-      <Toaster />
-    </div>
+
+          {/* </div> */}
+        </main>
+        <Toaster />
+      </div>
+    </ThemeProvider>
   );
 }
 
