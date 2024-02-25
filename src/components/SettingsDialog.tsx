@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from './ui/select';
+import { Theme, useTheme } from './ThemeProvider';
 
 const MODELS = [
   'gpt-4-0125-preview',
@@ -47,6 +48,7 @@ export type Settings = {
   openAiApiKey: string;
   systemPrompt: string;
   model: Model;
+  theme: Theme;
 };
 
 type SettingsDialogProps = {
@@ -66,6 +68,7 @@ export const SettingsDialog: FC<SettingsDialogProps> = ({
         openAiApiKey: data.get('openAiApiKey') as string,
         systemPrompt: data.get('systemPrompt') as string,
         model: data.get('model') as Model,
+        theme: data.get('theme') as Theme,
       });
     },
     [setSettings],
@@ -84,11 +87,11 @@ export const SettingsDialog: FC<SettingsDialogProps> = ({
         </DrawerTrigger>
         <DrawerContent>
           <div className="mx-auto w-full max-w-sm">
-            <DrawerHeader>
+            <DrawerHeader className="pl-0">
               <DrawerTitle>Settings</DrawerTitle>
             </DrawerHeader>
             <form className="" onSubmit={onSubmit}>
-              <div className="space-y-2">
+              <div className="py-2">
                 <div className="grid w-full max-w-sm items-center gap-1.5">
                   <Label htmlFor="openAiApiKey">OpenAI API Key</Label>
                   <Input
@@ -99,7 +102,7 @@ export const SettingsDialog: FC<SettingsDialogProps> = ({
                   />
                 </div>
               </div>
-              <div className="space-y-2">
+              <div className="py-2">
                 <Label htmlFor="systemPrompt">System prompt</Label>
                 <Textarea
                   id="systemPrompt"
@@ -107,11 +110,11 @@ export const SettingsDialog: FC<SettingsDialogProps> = ({
                   defaultValue={settings.systemPrompt}
                 />
               </div>
-              <div className="space-y-2">
+              <div className="py-2">
                 <Label htmlFor="model">GPT Model</Label>
-                <Select defaultValue={settings.model}>
+                <Select defaultValue={settings.model} name="model">
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a verified email to display" />
+                    <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     {MODELS.map((model) => (
@@ -122,12 +125,25 @@ export const SettingsDialog: FC<SettingsDialogProps> = ({
                   </SelectContent>
                 </Select>
               </div>
+              <div className="py-2">
+                <Label htmlFor="theme">Theme</Label>
+                <Select defaultValue={settings.theme} name="theme">
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="dark">Dark</SelectItem>
+                    <SelectItem value="light">Light</SelectItem>
+                    <SelectItem value="system">System</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <DrawerFooter>
+                <DrawerClose asChild>
+                  <Button type="submit">Save</Button>
+                </DrawerClose>
+              </DrawerFooter>
             </form>
-            <DrawerFooter>
-              <DrawerClose asChild>
-                <Button>Save</Button>
-              </DrawerClose>
-            </DrawerFooter>
           </div>
         </DrawerContent>
       </Drawer>

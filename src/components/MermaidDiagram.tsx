@@ -3,8 +3,12 @@ import { FC, useEffect, useState } from 'react';
 
 import { useSafeId } from '../hooks/useSafeId';
 
+import { useTheme } from './ThemeProvider';
+
 export const MermaidDiagram: FC<{ diagram: string }> = ({ diagram }) => {
   const containerId = useSafeId();
+
+  const { actualTheme } = useTheme();
 
   const [mermaidSvg, setMermaidSvg] = useState('');
 
@@ -12,10 +16,10 @@ export const MermaidDiagram: FC<{ diagram: string }> = ({ diagram }) => {
     mermaid.mermaidAPI.initialize({
       startOnLoad: true,
       securityLevel: 'loose',
-      theme: 'forest',
+      theme: actualTheme === 'dark' ? 'dark' : 'forest',
       logLevel: 5,
     });
-  }, []);
+  }, [actualTheme]);
 
   useEffect(() => {
     (async () => {
@@ -42,7 +46,7 @@ export const MermaidDiagram: FC<{ diagram: string }> = ({ diagram }) => {
 
       setMermaidSvg(svg);
     })();
-  }, [containerId, diagram]);
+  }, [containerId, diagram, actualTheme]);
 
   return <div dangerouslySetInnerHTML={{ __html: mermaidSvg }} />;
 };
