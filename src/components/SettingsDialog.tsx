@@ -20,7 +20,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from './ui/select';
-import { Theme, useTheme } from './ThemeProvider';
+import { Theme } from './ThemeProvider';
+import { Checkbox } from './ui/checkbox';
 
 const MODELS = [
   'gpt-4-0125-preview',
@@ -49,6 +50,7 @@ export type Settings = {
   systemPrompt: string;
   model: Model;
   theme: Theme;
+  autoCompilation: boolean;
 };
 
 type SettingsDialogProps = {
@@ -69,6 +71,7 @@ export const SettingsDialog: FC<SettingsDialogProps> = ({
         systemPrompt: data.get('systemPrompt') as string,
         model: data.get('model') as Model,
         theme: data.get('theme') as Theme,
+        autoCompilation: data.get('auto-compilation') === 'on',
       });
     },
     [setSettings],
@@ -138,9 +141,25 @@ export const SettingsDialog: FC<SettingsDialogProps> = ({
                   </SelectContent>
                 </Select>
               </div>
-              <DrawerFooter>
+              <div className="py-2">
+                <Label htmlFor="auto-compilation">Auto Compilation</Label>
+                <Checkbox
+                  className="mt-1"
+                  id="auto-compilation"
+                  defaultChecked={settings.autoCompilation}
+                  name="auto-compilation"
+                />
+              </div>
+              <DrawerFooter className="flex-row justify-end px-0">
                 <DrawerClose asChild>
-                  <Button type="submit">Save</Button>
+                  <Button type="button" variant="secondary" size="sm">
+                    Cancel
+                  </Button>
+                </DrawerClose>
+                <DrawerClose asChild>
+                  <Button type="submit" size="sm">
+                    Save
+                  </Button>
                 </DrawerClose>
               </DrawerFooter>
             </form>

@@ -1,29 +1,35 @@
-import { OpenAI } from 'openai';
-import SimpleMdeReact from 'react-simplemde-editor';
+import { SimpleMdeReact } from 'react-simplemde-editor';
 import {
   ComponentProps,
-  Dispatch,
-  ReactPropTypes,
-  SetStateAction,
+  useCallback,
+  useEffect,
   useMemo,
+  useState,
 } from 'react';
-import { encodeChat } from 'gpt-tokenizer';
 
 import 'easymde/dist/easymde.min.css';
 import './styles.css';
-import { Button } from '../ui/button';
-import { Checkbox } from '../ui/checkbox';
 import { useTheme } from '../ThemeProvider';
+import { Button } from '../ui/button';
 
 type Options = Required<ComponentProps<typeof SimpleMdeReact>>['options'];
 
 export type PromptInputProps = {
-  value: string;
-  setValue: (value: string) => void;
+  defaultValue: string;
+  onChange: (value: string) => void;
+  showButton: boolean;
+  loading: boolean;
 };
 
-export const PromptInput = ({ value, setValue }: PromptInputProps) => {
+export const PromptInput = ({
+  defaultValue,
+  onChange,
+  showButton,
+  loading,
+}: PromptInputProps) => {
   const { actualTheme } = useTheme();
+
+  const [value, setValue] = useState('');
 
   const options: Options = useMemo(
     () => ({
@@ -37,12 +43,38 @@ export const PromptInput = ({ value, setValue }: PromptInputProps) => {
     [actualTheme],
   );
 
+  useEffect(() => {
+    setValue(defaultValue);
+  }, [defaultValue]);
+
+  useEffect(() => {
+    if (!showButton) {
+      onChange(value);
+    }
+  }, [onChange, showButton, value]);
+
+  const onCompileClick = useCallback(() => {
+    onChange(value);
+  }, [onChange, value]);
+
   return (
-    <SimpleMdeReact
-      className="editor"
-      value={value}
-      onChange={setValue}
-      options={options}
-    />
+    <div className="relative h-full">
+      <SimpleMdeReact
+        className="editor"
+        value={value}
+        onChange={setValue}
+        options={options}
+      />
+      {showButton && (
+        <Button
+          className="absolute right-2 bottom-2"
+          size="sm"
+          onClick={onCompileClick}
+          disabled={loading || !value.trim() || value === defaultValue}
+        >
+          Compile
+        </Button>
+      )}
+    </div>
   );
 };

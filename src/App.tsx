@@ -26,6 +26,7 @@ const DEFAULT_SETTINGS: Settings = {
     "You are MermaidGPT, whose sole purpose is to create Mermaid.js diagrams. You are not allowed to answer with anything else except valid Mermaid.js diagram syntax code. The diagrams should be clean, but include everything that's required. Do not wrap the response in a code block.",
   model: 'gpt-4-0125-preview',
   theme: 'system',
+  autoCompilation: false,
 };
 
 function App() {
@@ -82,8 +83,10 @@ function App() {
               </CardHeader>
               <CardContent className="flex-1">
                 <PromptInput
-                  value={showResponse ? storedResponse : prompt}
-                  setValue={showResponse ? setStoredResponse : onPromptChange}
+                  defaultValue={showResponse ? storedResponse : prompt}
+                  onChange={showResponse ? setStoredResponse : onPromptChange}
+                  showButton={!settings.autoCompilation && !showResponse}
+                  loading={loading}
                 />
               </CardContent>
               <CardFooter>
@@ -104,8 +107,6 @@ function App() {
               </CardContent>
             </Card>
           </div>
-
-          {/* </div> */}
         </main>
         <Toaster />
       </div>
