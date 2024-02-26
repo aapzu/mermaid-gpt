@@ -75,7 +75,7 @@ function App() {
       <div className="flex flex-col h-full">
         <Header settings={settings} setSettings={setSettings} />
         <LoadingBar loading={loading} />
-        <main className="container mx-auto px-4 md:px-6 lg:px-8">
+        <main className="container mx-auto pt-2 px-4 pb-4 md:pb-6 md:pb-6 lg:px-8 flex-1">
           <div className="h-full grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card className="h-full flex flex-col">
               <CardHeader>

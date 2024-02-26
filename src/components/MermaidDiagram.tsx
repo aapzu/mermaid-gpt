@@ -16,7 +16,7 @@ export const MermaidDiagram: FC<{ diagram: string }> = ({ diagram }) => {
     mermaid.mermaidAPI.initialize({
       startOnLoad: true,
       securityLevel: 'loose',
-      theme: actualTheme === 'dark' ? 'dark' : 'forest',
+      theme: actualTheme === 'dark' ? 'dark' : 'default',
       logLevel: 5,
     });
   }, [actualTheme]);
