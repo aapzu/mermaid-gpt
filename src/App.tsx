@@ -2,6 +2,7 @@ import { useLocalStorage } from '@uidotdev/usehooks';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { pick } from 'lodash';
+import { Resizable } from 're-resizable';
 
 import { PromptInput } from './components/PromptInput';
 import { MermaidDiagram } from './components/MermaidDiagram';
@@ -29,6 +30,11 @@ const DEFAULT_SETTINGS: Settings = {
   autoCompilation: false,
 };
 
+const percentageToPixels = (percentage: string, el: HTMLElement) => {
+  const parentWidth = el.parentElement?.offsetWidth || 0;
+  return (parentWidth * parseInt(percentage)) / 100;
+};
+
 function App() {
   const [prompt, setPrompt] = useLocalStorage(
     'mermaid-gpt-prompt-text',
@@ -41,6 +47,10 @@ function App() {
   const [settings, setSettings] = useLocalStorage<Settings>(
     'mermaid-gpt-settings',
     DEFAULT_SETTINGS,
+  );
+  const [leftPanelWidth, setLeftPanelWidth] = useLocalStorage<string | number>(
+    'mermaid-gpt-left-panel-width',
+    '50%',
   );
 
   const [showResponse, setShowResponse] = useState(false);
@@ -75,9 +85,30 @@ function App() {
       <div className="flex flex-col h-full">
         <Header settings={settings} setSettings={setSettings} />
         <LoadingBar loading={loading} />
-        <main className="container mx-auto pt-2 px-4 pb-4 md:pb-6 md:pb-6 lg:px-8 flex-1">
-          <div className="h-full grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card className="h-full flex flex-col">
+        <main className="w-full pt-2 px-4 pb-4 md:pb-6 md:pb-6 lg:px-8 flex-1 flex">
+          <Resizable
+            size={{ width: leftPanelWidth, height: '100%' }}
+            minWidth="20%"
+            maxWidth="80%"
+            onResizeStop={(_e, _direction, ref, d) => {
+              const currentWidth =
+                typeof leftPanelWidth === 'string'
+                  ? percentageToPixels(leftPanelWidth, ref)
+                  : leftPanelWidth;
+              setLeftPanelWidth(currentWidth + d.width);
+            }}
+            enable={{
+              top: false,
+              right: true,
+              bottom: false,
+              left: false,
+              topRight: false,
+              bottomRight: false,
+              bottomLeft: false,
+              topLeft: false,
+            }}
+          >
+            <Card className="h-full flex flex-col mr-3">
               <CardHeader>
                 <CardTitle>Prompt</CardTitle>
               </CardHeader>
@@ -98,15 +129,15 @@ function App() {
                 />
               </CardFooter>
             </Card>
-            <Card className="h-full flex flex-col">
-              <CardHeader>
-                <CardTitle>Result</CardTitle>
-              </CardHeader>
-              <CardContent className="flex-1">
-                <MermaidDiagram diagram={storedResponse || ''} />
-              </CardContent>
-            </Card>
-          </div>
+          </Resizable>
+          <Card className="h-full flex flex-col ml-3 flex-1">
+            <CardHeader>
+              <CardTitle>Result</CardTitle>
+            </CardHeader>
+            <CardContent className="flex-1">
+              <MermaidDiagram diagram={storedResponse || ''} />
+            </CardContent>
+          </Card>
         </main>
         <Toaster />
       </div>
