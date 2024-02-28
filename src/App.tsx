@@ -30,11 +30,6 @@ const DEFAULT_SETTINGS: Settings = {
   autoCompilation: false,
 };
 
-const percentageToPixels = (percentage: string, el: HTMLElement) => {
-  const parentWidth = el.parentElement?.offsetWidth || 0;
-  return (parentWidth * parseInt(percentage)) / 100;
-};
-
 function App() {
   const [prompt, setPrompt] = useLocalStorage(
     'mermaid-gpt-prompt-text',
@@ -85,17 +80,13 @@ function App() {
       <div className="flex flex-col h-full">
         <Header settings={settings} setSettings={setSettings} />
         <LoadingBar loading={loading} />
-        <main className="w-full pt-2 px-4 pb-4 md:pb-6 md:pb-6 lg:px-8 flex-1 flex">
+        <main className="w-full pt-2 px-4 pb-4 md:pb-6 lg:px-8 flex-1 flex">
           <Resizable
             size={{ width: leftPanelWidth, height: '100%' }}
             minWidth="20%"
             maxWidth="80%"
-            onResizeStop={(_e, _direction, ref, d) => {
-              const currentWidth =
-                typeof leftPanelWidth === 'string'
-                  ? percentageToPixels(leftPanelWidth, ref)
-                  : leftPanelWidth;
-              setLeftPanelWidth(currentWidth + d.width);
+            onResizeStop={(_e, _direction, ref) => {
+              setLeftPanelWidth(ref.clientWidth);
             }}
             enable={{
               top: false,
