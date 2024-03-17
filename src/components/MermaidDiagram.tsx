@@ -23,7 +23,7 @@ export const MermaidDiagram: FC<{ diagram: string }> = ({ diagram }) => {
 
   useEffect(() => {
     (async () => {
-      if (!diagram) {
+      if (!diagram || !actualTheme) {
         return;
       }
 
