@@ -31,7 +31,7 @@ const DEFAULT_SETTINGS: Settings = {
 };
 
 function App() {
-  const [prompt, setPrompt] = useLocalStorage(
+  const [storedPrompt, setStoredPrompt] = useLocalStorage(
     'mermaid-gpt-prompt-text',
     'A sequence diagram with three actors. Add some random content.',
   );
@@ -57,10 +57,10 @@ function App() {
 
   const onPromptChange = useCallback(
     (prompt: string) => {
-      setPrompt(prompt);
+      setStoredPrompt(prompt);
       sendPrompt(prompt);
     },
-    [sendPrompt, setPrompt],
+    [sendPrompt, setStoredPrompt],
   );
 
   useEffect(() => {
@@ -73,7 +73,7 @@ function App() {
     if (error) {
       toast.error(error.message);
     }
-  }, [error, prompt, setStoredResponse]);
+  }, [error, storedPrompt, setStoredResponse]);
 
   return (
     <ThemeProvider theme={settings.theme}>
@@ -105,9 +105,12 @@ function App() {
               </CardHeader>
               <CardContent className="flex-1">
                 <PromptInput
-                  defaultValue={showResponse ? storedResponse : prompt}
-                  onChange={showResponse ? setStoredResponse : onPromptChange}
-                  showButton={!settings.autoCompilation && !showResponse}
+                  defaultPromptValue={storedPrompt}
+                  onPromptChange={onPromptChange}
+                  defaultResponseValue={storedResponse}
+                  onResponseChange={setStoredResponse}
+                  autoCompile={settings.autoCompilation}
+                  showResponse={showResponse}
                   loading={loading}
                 />
               </CardContent>
