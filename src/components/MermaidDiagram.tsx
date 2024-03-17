@@ -1,12 +1,15 @@
 import mermaid from 'mermaid';
 import { FC, useEffect, useState } from 'react';
+import { UncontrolledReactSVGPanZoom, TOOL_PAN } from 'react-svg-pan-zoom';
+import { ReactSvgPanZoomLoader } from 'react-svg-pan-zoom-loader';
 
 import { useSafeId } from '../hooks/useSafeId';
 
 import { useTheme } from './ThemeProvider';
+import { AutoResize } from './AutoResize';
 
 export const MermaidDiagram: FC<{ diagram: string }> = ({ diagram }) => {
-  const containerId = useSafeId();
+  const diagramId = useSafeId();
 
   const { actualTheme } = useTheme();
 
@@ -40,13 +43,40 @@ export const MermaidDiagram: FC<{ diagram: string }> = ({ diagram }) => {
       }
 
       const { svg } = await mermaid.mermaidAPI.render(
-        CSS.escape(containerId),
+        CSS.escape(diagramId),
         diagram,
       );
 
       setMermaidSvg(svg);
     })();
-  }, [containerId, diagram, actualTheme]);
+  }, [diagramId, diagram, actualTheme]);
 
-  return <div dangerouslySetInnerHTML={{ __html: mermaidSvg }} />;
+  const isSvg = mermaidSvg.startsWith('<svg');
+
+  return isSvg ? (
+    <AutoResize>
+      {({ width, height }) => (
+        <ReactSvgPanZoomLoader
+          svgXML={mermaidSvg}
+          render={(content) => (
+            <UncontrolledReactSVGPanZoom
+              width={width}
+              height={height}
+              defaultTool={TOOL_PAN}
+              background="transparent"
+              toolbarProps={{
+                position: 'none',
+              }}
+            >
+              <svg width={100} height={100}>
+                {content}
+              </svg>
+            </UncontrolledReactSVGPanZoom>
+          )}
+        />
+      )}
+    </AutoResize>
+  ) : (
+    <>{mermaidSvg}</>
+  );
 };

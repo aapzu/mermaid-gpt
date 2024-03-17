@@ -66,6 +66,7 @@ export const PromptInput = ({
       autoDownloadFontAwesome: false,
       uploadImage: false,
       theme: actualTheme === 'dark' ? 'twilight' : 'easymd',
+      maxHeight: '100%',
     }),
     [actualTheme],
   );

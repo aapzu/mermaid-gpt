@@ -80,7 +80,7 @@ function App() {
       <div className="flex flex-col h-full">
         <Header settings={settings} setSettings={setSettings} />
         <LoadingBar loading={loading} />
-        <main className="w-full pt-2 px-4 pb-4 md:pb-6 lg:px-8 flex-1 flex">
+        <main className="w-full pt-2 px-4 pb-4 md:pb-6 lg:px-8 flex-1 flex min-h-0">
           <Resizable
             size={{ width: leftPanelWidth, height: '100%' }}
             minWidth="20%"
@@ -103,7 +103,7 @@ function App() {
               <CardHeader>
                 <CardTitle>Prompt</CardTitle>
               </CardHeader>
-              <CardContent className="flex-1">
+              <CardContent className="flex-1 overflow-auto">
                 <PromptInput
                   defaultPromptValue={storedPrompt}
                   onPromptChange={onPromptChange}
@@ -124,11 +124,11 @@ function App() {
               </CardFooter>
             </Card>
           </Resizable>
-          <Card className="h-full flex flex-col ml-3 flex-1">
+          <Card className="h-full flex flex-col ml-3 flex-1 overflow-hidden">
             <CardHeader>
               <CardTitle>Result</CardTitle>
             </CardHeader>
-            <CardContent className="flex-1">
+            <CardContent className="flex-1 min-h-0">
               <MermaidDiagram diagram={storedResponse || ''} />
             </CardContent>
           </Card>
